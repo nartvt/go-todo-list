@@ -16,6 +16,8 @@ func init() {
 
 type IUser interface {
 	GetUserByEmail(email string) (model.User, error)
+	CreateUser(user *model.User) error
+	UpdateUser(user *model.User) error
 }
 
 func (user) GetUserByEmail(email string) (model.User, error) {
@@ -27,4 +29,18 @@ func (user) GetUserByEmail(email string) (model.User, error) {
 		Where("email = ?", email).
 		Select(&user).Error
 	return user, err
+}
+
+func (user) CreateUser(user *model.User) error {
+	err := database.MySQL.Create(user).
+		Error
+	return err
+}
+
+func (user) UpdateUser(user *model.User) error {
+	err := database.MySQL.
+		Where("id = ?", user.Id).
+		Updates(user).
+		Error
+	return err
 }

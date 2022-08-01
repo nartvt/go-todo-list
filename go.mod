@@ -3,6 +3,7 @@ module github.com/nartvt/go-todo-list
 go 1.17
 
 require (
+	github.com/gin-gonic/contrib v0.0.0-20201101042839-6a891bf89f19
 	github.com/gin-gonic/gin v1.8.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/spf13/viper v1.12.0

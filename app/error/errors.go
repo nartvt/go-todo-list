@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"runtime"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 type StatusError struct {
@@ -69,4 +71,9 @@ func Error(e error, s int, t string, m string) *StatusError {
 		Line:    l,
 	}
 	return err
+}
+
+func HandlerErrorGin(c *gin.Context, err error) {
+	c.Next()
+	c.Error(err)
 }

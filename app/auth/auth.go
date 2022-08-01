@@ -29,7 +29,11 @@ func (au auth) Login(email string, password string) (string, error) {
 	if err != nil {
 		return "", errHandler.InternalError(err)
 	}
-	return au.generateToken(user.Id, []byte(user.Password), []byte(password))
+	return au.GenerateToken(user.Id, []byte(user.Password), []byte(password))
+}
+
+func (au auth) GenerateToken(userId int, hashPassword, password []byte) (string, error) {
+	return au.generateToken(userId, hashPassword, password)
 }
 
 func (auth) generateToken(userId int, hashPassword, password []byte) (string, error) {
@@ -47,5 +51,4 @@ func (auth) generateToken(userId int, hashPassword, password []byte) (string, er
 
 	token, err := claims.SignedString([]byte(secretKey))
 	return token, err
-
 }
