@@ -7,12 +7,12 @@ import (
 )
 
 type TodoItem struct {
-	Id        int
-	Title     string
-	Content   string
-	Status    string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	Id        int       `json:"id"`
+	Title     string    `json:"title"`
+	Content   string    `json:"content"`
+	Status    string    `json:"status"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 func NewViewTodoItem(item model.TodoItem) TodoItem {
@@ -24,4 +24,12 @@ func NewViewTodoItem(item model.TodoItem) TodoItem {
 		CreatedAt: item.CreatedAt,
 		UpdatedAt: item.UpdatedAt,
 	}
+}
+
+func NewViewTodoItems(items []model.TodoItem) []TodoItem {
+	todoItems := make([]TodoItem, len(items))
+	for i := range items {
+		todoItems[i] = NewViewTodoItem(items[i])
+	}
+	return todoItems
 }

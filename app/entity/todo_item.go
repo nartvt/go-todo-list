@@ -3,9 +3,11 @@ package entity
 import (
 	"time"
 
+	errHandler "github.com/nartvt/go-todo-list/app/error"
 	"github.com/nartvt/go-todo-list/app/handler/request"
 	"github.com/nartvt/go-todo-list/app/model"
 	"github.com/nartvt/go-todo-list/app/orm"
+	"gorm.io/gorm"
 )
 
 var TodoItemEntity ITodoItem
@@ -44,31 +46,36 @@ func (todoItem) Create(item *request.TodoItem) (model.TodoItem, error) {
 	return itemModel, nil
 }
 
-func (todoItem) UpdateById(item *request.TodoItem, itemId int) (model.TodoItem, error) {
-	if item == nil {
+func (todoItem) UpdateById(input *request.TodoItem, itemId int) (model.TodoItem, error) {
+	if input == nil {
 		return model.TodoItem{}, nil
 	}
-
-	now := time.Now()
-	itemModel := model.TodoItem{
-		Id:        itemId,
-		Title:     item.Title,
-		Status:    item.Status,
-		Content:   item.Content,
-		UpdatedAt: now,
+	item, err := orm.TodoITem.GetItemById(itemId)
+	if err == gorm.ErrRecordNotFound {
+		return model.TodoItem{}, errHandler.NotFoundError(err)
 	}
-	err := orm.TodoITem.UpdateById(&itemModel, itemId)
+
+	item.Title = input.Title
+	item.Status = input.Status
+	item.Content = input.Content
+	item.UpdatedAt = time.Now()
+	err = orm.TodoITem.UpdateById(&item, itemId)
 	if err != nil {
 		return model.TodoItem{}, err
 	}
-	return itemModel, nil
+	return item, nil
 }
 
 func (todoItem) DeleteById(itemId int) (model.TodoItem, error) {
 	if itemId <= 0 {
 		return model.TodoItem{}, nil
 	}
-	item, err := orm.TodoITem.DeleteById(itemId)
+
+	item, err := orm.TodoITem.GetItemById(itemId)
+	if err == gorm.ErrRecordNotFound {
+		return model.TodoItem{}, errHandler.NotFoundError(err)
+	}
+	err = orm.TodoITem.DeleteById(itemId)
 	if err != nil {
 		return item, err
 	}
@@ -80,6 +87,9 @@ func (todoItem) GetItemById(itemId int) (model.TodoItem, error) {
 		return model.TodoItem{}, nil
 	}
 	item, err := orm.TodoITem.GetItemById(itemId)
+	if err == gorm.ErrRecordNotFound {
+		return model.TodoItem{}, errHandler.NotFoundError(err)
+	}
 	if err != nil {
 		return model.TodoItem{}, err
 	}

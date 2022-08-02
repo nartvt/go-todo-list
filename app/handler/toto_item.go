@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -28,7 +29,7 @@ func (todoItem) Create(c *gin.Context) {
 		errHandler.HandlerErrorGin(c, err)
 		return
 	}
-	c.JSON(http.StatusCreated, itemResp)
+	c.JSON(http.StatusCreated, response.NewViewTodoItem(itemResp))
 }
 
 func (todoItem) Update(c *gin.Context) {
@@ -49,11 +50,17 @@ func (todoItem) Update(c *gin.Context) {
 		errHandler.HandlerErrorGin(c, err)
 		return
 	}
-	c.JSON(http.StatusCreated, itemResp)
+	c.JSON(http.StatusOK, response.NewViewTodoItem(itemResp))
 }
 
 func (todoItem) Delete(c *gin.Context) {
-	itemId, err := strconv.Atoi(c.Param("itemId"))
+	itemIdStr := c.Param("itemId")
+	fmt.Println("AHIIII - " + itemIdStr)
+	if len(itemIdStr) <= 0 {
+		errHandler.HandlerErrorGin(c, errHandler.NotFoundError(fmt.Errorf("not found item")))
+		return
+	}
+	itemId, err := strconv.Atoi(itemIdStr)
 	if err != nil {
 		errHandler.HandlerErrorGin(c, err)
 		return
@@ -65,7 +72,7 @@ func (todoItem) Delete(c *gin.Context) {
 		errHandler.HandlerErrorGin(c, err)
 		return
 	}
-	c.JSON(http.StatusCreated, itemResp)
+	c.JSON(http.StatusOK, response.NewViewTodoItem(itemResp))
 }
 
 func (todoItem) GetById(c *gin.Context) {
@@ -80,33 +87,25 @@ func (todoItem) GetById(c *gin.Context) {
 		errHandler.HandlerErrorGin(c, err)
 		return
 	}
-	c.JSON(http.StatusCreated, itemResp)
+	c.JSON(http.StatusOK, response.NewViewTodoItem(itemResp))
 }
 
 func (todoItem) GetItems(c *gin.Context) {
-	pagination := response.Pagination{}
-	err := c.ShouldBind(&pagination)
+	param := request.GetParams(c)
+	items, total, err := entity.TodoItemEntity.GetItems(param.Limit, param.Offset)
 	if err != nil {
 		errHandler.HandlerErrorGin(c, err)
 		return
 	}
 
-	if pagination.Limit <= 0 {
-		pagination.Limit = 1
-	}
-	if pagination.Page <= 0 {
-		pagination.Page = 1
-	}
-	offset := (pagination.Page - 1) * pagination.Limit
-	items, total, err := entity.TodoItemEntity.GetItems(pagination.Limit, offset)
-	if err != nil {
-		errHandler.HandlerErrorGin(c, err)
+	if len(items) == param.Limit {
+		pagination := response.Pagination{
+			Data:  response.NewViewTodoItems(items),
+			Total: int(total),
+			Page:  param.Page + 1,
+		}
+		c.JSON(http.StatusCreated, pagination)
 		return
 	}
-	pagination.Data = items
-	pagination.Total = int(total)
-	if len(items) == pagination.Limit {
-		pagination.Page += 1
-	}
-	c.JSON(http.StatusCreated, pagination)
+	c.JSON(http.StatusCreated, response.NewViewTodoItems(items))
 }

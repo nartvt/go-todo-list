@@ -72,8 +72,16 @@ func Error(e error, s int, t string, m string) *StatusError {
 	}
 	return err
 }
+func ToStatusError(e error) *StatusError {
+	if err, ok := e.(*StatusError); ok {
+		return err
+	}
+	return Error(e, http.StatusInternalServerError, "Error", "Sorry, an error occurred.")
+}
 
-func HandlerErrorGin(c *gin.Context, err error) {
-	c.Next()
-	c.Error(err)
+func HandlerErrorGin(c *gin.Context, e error) {
+	err := ToStatusError(e)
+	c.Error(err.Err)
+	c.Writer.Header().Set("Content-Type", "application/json")
+	c.AbortWithStatus(err.Status)
 }

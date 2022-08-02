@@ -9,10 +9,11 @@ import (
 var Config config
 
 type config struct {
-	MySQL Mysql
+	MySQL   DBConnectInfo
+	Posgres DBConnectInfo
 }
 
-type Mysql struct {
+type DBConnectInfo struct {
 	Host     string
 	Port     int
 	UserName string

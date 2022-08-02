@@ -4,3 +4,10 @@ mysql:
   userName: tai
   password: Taismile-123
   database: todo_list
+
+posgres:
+  host: ec2-52-207-15-147.compute-1.amazonaws.com
+  port: 5432
+  userName: ihsuujzrrjynlm
+  password: 656a9d45da15dc4440f786d14ea3ee7ea1e435952a6ae6f61c0f5817fcbdfead
+  database: d6p53oie4f3q34

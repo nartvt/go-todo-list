@@ -18,5 +18,6 @@ func setupRoute() {
 }
 
 func setupDatabase() {
-	database.InitMysql()
+	// database.InitMysql()
+	database.InitPostgres()
 }
