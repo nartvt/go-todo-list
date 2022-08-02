@@ -26,7 +26,8 @@ func (todoItem) Create(item *model.TodoItem) error {
 }
 
 func (todoItem) UpdateById(item *model.TodoItem, itemId int) error {
-	return database.MySQL.Model(item).
+	return database.MySQL.
+		Model(&item).
 		Where("id = ?", itemId).
 		Updates(item).
 		Error
@@ -34,7 +35,9 @@ func (todoItem) UpdateById(item *model.TodoItem, itemId int) error {
 
 func (todoItem) DeleteById(itemId int) (model.TodoItem, error) {
 	item := model.TodoItem{}
-	err := database.MySQL.Where("id = ?", itemId).
+	err := database.MySQL.
+		Model(&item).
+		Where("id = ?", itemId).
 		Delete(&item).
 		Error
 	return item, err
@@ -42,7 +45,9 @@ func (todoItem) DeleteById(itemId int) (model.TodoItem, error) {
 
 func (todoItem) GetItemById(itemId int) (model.TodoItem, error) {
 	item := model.TodoItem{}
-	err := database.MySQL.Where("id = ?", itemId).
+	err := database.MySQL.
+		Model(&item).
+		Where("id = ?", itemId).
 		First(&item).
 		Error
 	return item, err
@@ -51,7 +56,7 @@ func (todoItem) GetItemById(itemId int) (model.TodoItem, error) {
 func (todoItem) GetItems(limit, offset int) ([]model.TodoItem, int64, error) {
 	var items []model.TodoItem
 	total := int64(0)
-	err := database.MySQL.
+	err := database.MySQL.Model(&items).
 		Count(&total).
 		Offset(offset).
 		Limit(limit).

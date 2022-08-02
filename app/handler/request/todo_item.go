@@ -3,9 +3,9 @@ package request
 import "github.com/gin-gonic/gin"
 
 type TodoItem struct {
-	Title   string
-	Content string
-	Status  string
+	Title   string `json:"title"`
+	Content string `json:"content"`
+	Status  string `json:"status"`
 }
 
 func BindTodoItem(c *gin.Context) (TodoItem, error) {

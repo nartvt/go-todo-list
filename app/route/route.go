@@ -23,7 +23,7 @@ func SetupRoute(r *gin.Engine) {
 }
 
 func todoRoute(r *gin.Engine) {
-	t := r.Group("todo_items")
+	t := r.Group("api/v1")
 	t.POST("items", handler.TodoItem.Create)
 	t.PUT("items/:itemId", handler.TodoItem.Update)
 	t.DELETE("items/:itemId", handler.TodoItem.Delete)
